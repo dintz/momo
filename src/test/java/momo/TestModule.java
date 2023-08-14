@@ -28,6 +28,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 
@@ -49,7 +50,7 @@ public class TestModule extends AbstractModule
     public JsonMapper provideMapper()
     {
         final var mapper = new JsonMapper();
-        mapper.findAndRegisterModules();
+        mapper.registerModule(new JavaTimeModule());
 
         return mapper;
     }

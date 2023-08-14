@@ -32,6 +32,7 @@ import java.nio.file.Path;
 import org.apache.commons.lang3.SystemUtils;
 
 import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 
@@ -46,7 +47,7 @@ public class BasicModule extends AbstractModule
         public JsonMapper provideMapper()
         {
             final var mapper = new JsonMapper();
-            mapper.findAndRegisterModules();
+            mapper.registerModule(new JavaTimeModule());
 
             return mapper;
         }
