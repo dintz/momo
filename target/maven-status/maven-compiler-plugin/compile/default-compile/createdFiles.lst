@@ -1,4 +1,11 @@
-META-INF/native-image/picocli-generated/momo/app/reflect-config.json
+momo/model/MonthlyRecording.class
+momo/model/TimeRecord$TimeRecordBuilder.class
 META-INF/native-image/picocli-generated/momo/app/proxy-config.json
+momo/model/DailyRecording$DailyRecordingBuilder.class
 momo/MomoCli.class
+momo/model/DailyRecording.class
+META-INF/native-image/picocli-generated/momo/app/reflect-config.json
+momo/model/MonthlyRecording$MonthlyRecordingBuilder.class
+momo/model/TimeRecord.class
+momo/command/sub/MomoTrack.class
 META-INF/native-image/picocli-generated/momo/app/resource-config.json

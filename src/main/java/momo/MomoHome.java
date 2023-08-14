@@ -24,39 +24,17 @@
 
 package momo;
 
-import java.util.concurrent.Callable;
+import java.lang.annotation.Retention;
 
-import momo.command.MomoTrack;
-import picocli.CommandLine;
-import picocli.CommandLine.Command;
+import jakarta.inject.Qualifier;
+
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
  * FIXME
  */
-@Command(name = "momo",
-        mixinStandardHelpOptions = true,
-        version = "0.1",
-        description = "Records, checks and evaluates daily working hours.",
-        subcommands = { MomoTrack.class }
-)
-public class MomoCli implements Callable<Integer>
+@Qualifier
+@Retention(RUNTIME)
+public @interface MomoHome
 {
-    @Override
-    public Integer call()
-    {
-        System.out.println("... test it ...");
-        return 0;
-    }
-
-    /**
-     * TODO
-     *
-     * @param args
-     */
-    public static void main(String[] args)
-    {
-        var exitCode = new CommandLine(MomoCli.class, new GuiceFactory()).execute(args);
-
-        System.exit(exitCode);
-    }
 }

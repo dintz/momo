@@ -24,39 +24,43 @@
 
 package momo;
 
-import java.util.concurrent.Callable;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
-import momo.command.MomoTrack;
+import org.apache.commons.lang3.SystemUtils;
+
+import com.google.inject.AbstractModule;
+import com.google.inject.ConfigurationException;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.google.inject.Provides;
+
+import momo.services.FileBasedMonthlyHoursService;
+import momo.services.MonthlyHoursService;
 import picocli.CommandLine;
-import picocli.CommandLine.Command;
+import picocli.CommandLine.IFactory;
 
 /**
- * FIXME
+ * @see <a href="https://picocli.info/#_guice_example">Picocli - Guice Example<a/>
  */
-@Command(name = "momo",
-        mixinStandardHelpOptions = true,
-        version = "0.1",
-        description = "Records, checks and evaluates daily working hours.",
-        subcommands = { MomoTrack.class }
-)
-public class MomoCli implements Callable<Integer>
+public class GuiceFactory implements IFactory
 {
+    private final Injector injector = Guice.createInjector(new BasicModule());
+
     @Override
-    public Integer call()
+    public <K> K create(Class<K> aClass) throws Exception
     {
-        System.out.println("... test it ...");
-        return 0;
+        try
+        {
+            return injector.getInstance(aClass);
+        }
+        catch (ConfigurationException ex)
+        {
+            // no implementation found in Guice configuration
+            return CommandLine.defaultFactory().create(aClass); // fallback if missing
+        }
     }
 
-    /**
-     * TODO
-     *
-     * @param args
-     */
-    public static void main(String[] args)
-    {
-        var exitCode = new CommandLine(MomoCli.class, new GuiceFactory()).execute(args);
-
-        System.exit(exitCode);
-    }
 }

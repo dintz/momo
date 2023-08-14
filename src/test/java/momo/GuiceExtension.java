@@ -24,39 +24,35 @@
 
 package momo;
 
-import java.util.concurrent.Callable;
+import java.lang.reflect.Field;
 
-import momo.command.MomoTrack;
-import picocli.CommandLine;
-import picocli.CommandLine.Command;
+import org.apache.commons.lang3.reflect.FieldUtils;
+import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.api.extension.TestInstancePostProcessor;
 
-/**
- * FIXME
- */
-@Command(name = "momo",
-        mixinStandardHelpOptions = true,
-        version = "0.1",
-        description = "Records, checks and evaluates daily working hours.",
-        subcommands = { MomoTrack.class }
-)
-public class MomoCli implements Callable<Integer>
+import com.google.inject.Guice;
+import com.google.inject.Inject;
+import com.google.inject.Injector;
+
+public class GuiceExtension implements TestInstancePostProcessor
 {
-    @Override
-    public Integer call()
+    private final Injector injector;
+
+    public GuiceExtension()
     {
-        System.out.println("... test it ...");
-        return 0;
+        injector = Guice.createInjector(new TestModule());
     }
 
-    /**
-     * TODO
-     *
-     * @param args
-     */
-    public static void main(String[] args)
+    @Override
+    public void postProcessTestInstance(final Object testInstance, final ExtensionContext extensionContext)
+            throws Exception
     {
-        var exitCode = new CommandLine(MomoCli.class, new GuiceFactory()).execute(args);
-
-        System.exit(exitCode);
+        for (Field field : testInstance.getClass().getDeclaredFields())
+        {
+            if (field.isAnnotationPresent(Inject.class))
+            {
+                FieldUtils.writeField(field, testInstance, injector.getInstance(field.getType()), true);
+            }
+        }
     }
 }

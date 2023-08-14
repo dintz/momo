@@ -22,41 +22,56 @@
  * SOFTWARE.
  */
 
-package momo;
+package momo.model;
 
-import java.util.concurrent.Callable;
+import java.time.YearMonth;
+import java.util.NavigableSet;
+import java.util.Objects;
+import java.util.TreeSet;
 
-import momo.command.MomoTrack;
-import picocli.CommandLine;
-import picocli.CommandLine.Command;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
- * FIXME
+ * TODO
  */
-@Command(name = "momo",
-        mixinStandardHelpOptions = true,
-        version = "0.1",
-        description = "Records, checks and evaluates daily working hours.",
-        subcommands = { MomoTrack.class }
-)
-public class MomoCli implements Callable<Integer>
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class MonthlyRecording
 {
-    @Override
-    public Integer call()
+    @JsonProperty("month")
+    private YearMonth month;
+
+    @Builder.Default
+    @JsonDeserialize(as = TreeSet.class)
+    @JsonProperty("days")
+    private NavigableSet<DailyRecording> days = new TreeSet<>();
+
+    public void add(final DailyRecording dailyRecording)
     {
-        System.out.println("... test it ...");
-        return 0;
+        days.add(dailyRecording);
     }
 
-    /**
-     * TODO
-     *
-     * @param args
-     */
-    public static void main(String[] args)
+    public static MonthlyRecording createFor(final YearMonth month)
     {
-        var exitCode = new CommandLine(MomoCli.class, new GuiceFactory()).execute(args);
+        Objects.requireNonNull(month, "month");
 
-        System.exit(exitCode);
+        return MonthlyRecording.builder()
+                .month(month)
+                .build();
+    }
+
+    public static MonthlyRecording createForNow()
+    {
+        return MonthlyRecording.builder()
+                .month(YearMonth.now())
+                .build();
     }
 }

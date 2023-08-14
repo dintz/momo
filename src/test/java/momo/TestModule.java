@@ -24,39 +24,39 @@
 
 package momo;
 
-import java.util.concurrent.Callable;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
-import momo.command.MomoTrack;
-import picocli.CommandLine;
-import picocli.CommandLine.Command;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.google.inject.AbstractModule;
+import com.google.inject.Provides;
 
-/**
- * FIXME
- */
-@Command(name = "momo",
-        mixinStandardHelpOptions = true,
-        version = "0.1",
-        description = "Records, checks and evaluates daily working hours.",
-        subcommands = { MomoTrack.class }
-)
-public class MomoCli implements Callable<Integer>
+import momo.services.FileBasedMonthlyHoursService;
+import momo.services.MonthlyHoursService;
+
+public class TestModule extends AbstractModule
 {
-    @Override
-    public Integer call()
+    public static Path FAKE_HOME = Paths.get("src","test","resources", "fake-home");
+
+    @Provides
+    @MomoHome
+    public Path provideMomoHome()
     {
-        System.out.println("... test it ...");
-        return 0;
+       return FAKE_HOME;
     }
 
-    /**
-     * TODO
-     *
-     * @param args
-     */
-    public static void main(String[] args)
+    @Provides
+    public JsonMapper provideMapper()
     {
-        var exitCode = new CommandLine(MomoCli.class, new GuiceFactory()).execute(args);
+        final var mapper = new JsonMapper();
+        mapper.findAndRegisterModules();
 
-        System.exit(exitCode);
+        return mapper;
+    }
+
+    @Override
+    protected void configure()
+    {
+        bind(MonthlyHoursService.class).to(FileBasedMonthlyHoursService.class);
     }
 }

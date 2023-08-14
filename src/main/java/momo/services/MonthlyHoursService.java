@@ -22,41 +22,29 @@
  * SOFTWARE.
  */
 
-package momo;
+package momo.services;
 
-import java.util.concurrent.Callable;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.YearMonth;
 
-import momo.command.MomoTrack;
-import picocli.CommandLine;
-import picocli.CommandLine.Command;
-
-/**
- * FIXME
- */
-@Command(name = "momo",
-        mixinStandardHelpOptions = true,
-        version = "0.1",
-        description = "Records, checks and evaluates daily working hours.",
-        subcommands = { MomoTrack.class }
-)
-public class MomoCli implements Callable<Integer>
+public interface MonthlyHoursService
 {
-    @Override
-    public Integer call()
-    {
-        System.out.println("... test it ...");
-        return 0;
-    }
+    /**
+     * @param timeRecord
+     *         the record to add, not null
+     *
+     * @throws FileNotFoundException
+     *         if the monthly recording file for the given month doesn't exist
+     */
+    void writeRecord(final LocalDateTime timeRecord) throws IOException;
 
     /**
-     * TODO
+     * @param month
+     *         the month of the recording to create, not null
      *
-     * @param args
+     * @return <code>true</code> if new recording is created
      */
-    public static void main(String[] args)
-    {
-        var exitCode = new CommandLine(MomoCli.class, new GuiceFactory()).execute(args);
-
-        System.exit(exitCode);
-    }
+    boolean createMonthlyRecordingIfAbsent(final YearMonth month) throws IOException;
 }
