@@ -26,9 +26,14 @@ package momo;
 
 import java.util.concurrent.Callable;
 
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import momo.command.MomoTrack;
+import momo.config.GuiceFactory;
+import momo.config.LoggingMixin;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
+import picocli.CommandLine.Mixin;
 
 /**
  * FIXME
@@ -39,12 +44,21 @@ import picocli.CommandLine.Command;
         description = "Records, checks and evaluates daily working hours.",
         subcommands = { MomoTrack.class }
 )
+@Slf4j
 public class MomoCli implements Callable<Integer>
 {
+    @Mixin
+    @Getter
+    private LoggingMixin loggingMixin;
+
     @Override
     public Integer call()
     {
-        System.out.println("... test it ...");
+        log.trace("Starting... (trace) from app");
+        log.debug("Starting... (debug) from app");
+        log.info("Starting... (info)  from app");
+        log.warn("Starting... (warn)  from app");
+
         return 0;
     }
 
@@ -55,7 +69,9 @@ public class MomoCli implements Callable<Integer>
      */
     public static void main(String[] args)
     {
-        var exitCode = new CommandLine(MomoCli.class, new GuiceFactory()).execute(args);
+        var exitCode = new CommandLine(MomoCli.class, new GuiceFactory())
+                .setExecutionStrategy(LoggingMixin::executionStrategy)
+                .execute(args);
 
         System.exit(exitCode);
     }

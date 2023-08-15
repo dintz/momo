@@ -32,6 +32,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 
+import momo.config.MomoHome;
 import momo.services.FileBasedMonthlyHoursService;
 import momo.services.MonthlyHoursService;
 

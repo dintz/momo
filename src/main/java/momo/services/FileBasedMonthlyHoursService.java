@@ -37,7 +37,7 @@ import java.util.Objects;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.google.inject.Inject;
 
-import momo.MomoHome;
+import momo.config.MomoHome;
 import momo.model.DailyRecording;
 import momo.model.MonthlyRecording;
 

@@ -22,23 +22,12 @@
  * SOFTWARE.
  */
 
-package momo;
+package momo.config;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-
-import org.apache.commons.lang3.SystemUtils;
-
-import com.google.inject.AbstractModule;
 import com.google.inject.ConfigurationException;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import com.google.inject.Provides;
 
-import momo.services.FileBasedMonthlyHoursService;
-import momo.services.MonthlyHoursService;
 import picocli.CommandLine;
 import picocli.CommandLine.IFactory;
 

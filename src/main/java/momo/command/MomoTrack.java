@@ -33,7 +33,8 @@ import java.util.concurrent.Callable;
 
 import com.google.inject.Inject;
 
-import momo.MomoHome;
+import lombok.extern.slf4j.Slf4j;
+import momo.config.MomoHome;
 import momo.services.MonthlyHoursService;
 import picocli.CommandLine.Command;
 
@@ -43,6 +44,7 @@ import static java.time.temporal.ChronoUnit.MINUTES;
  * TODO
  */
 @Command(name = "track", description = "I'm a subcommand of `momo`")
+@Slf4j
 public class MomoTrack implements Callable<Integer>
 {
     @Inject
@@ -62,12 +64,12 @@ public class MomoTrack implements Callable<Integer>
         {
             if (service.createMonthlyRecordingIfAbsent(YearMonth.now()))
             {
-                System.out.printf("New monthly recording for %s created%n", YearMonth.now());
+                log.debug("New monthly recording for {} created", YearMonth.now());
             }
         }
         catch (IOException e)
         {
-            System.err.printf("New monthly recording cannot be created: %s%n", e.getMessage());
+            log.error("New monthly recording cannot be created: {}", e.getMessage(), e);
             return 1;
         }
 
@@ -75,11 +77,12 @@ public class MomoTrack implements Callable<Integer>
         {
             var tRecord = LocalDateTime.now().truncatedTo(MINUTES);
             service.writeRecord(tRecord);
-            System.out.printf("Record %02d:%02d was added to today", tRecord.getHour(), tRecord.getMinute());
+
+            log.info("Record %02d:%02d was added to today".formatted(tRecord.getHour(), tRecord.getMinute()));
         }
         catch (IOException e)
         {
-            System.err.printf("New record cannot be written: %s%n", e.getMessage());
+            log.error("New record cannot be written: {}", e.getMessage(), e);
             return 1;
         }
 

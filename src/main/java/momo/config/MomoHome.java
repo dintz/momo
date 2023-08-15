@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package momo;
+package momo.config;
 
 import java.lang.annotation.Retention;
 

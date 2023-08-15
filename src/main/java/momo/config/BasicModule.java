@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package momo;
+package momo.config;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -40,38 +40,38 @@ import momo.services.FileBasedMonthlyHoursService;
 import momo.services.MonthlyHoursService;
 
 public class BasicModule extends AbstractModule
+{
+    private static final String MOMO_FOLDER_NAME = ".momo";
+
+    @Provides
+    public JsonMapper provideMapper()
     {
-        private static final String MOMO_FOLDER_NAME = ".momo";
+        final var mapper = new JsonMapper();
+        mapper.registerModule(new JavaTimeModule());
 
-        @Provides
-        public JsonMapper provideMapper()
+        return mapper;
+    }
+
+    @Provides
+    @MomoHome
+    public Path provideMomoHome()
+    {
+        Path userHome = SystemUtils.getUserHome().toPath();
+
+        try
         {
-            final var mapper = new JsonMapper();
-            mapper.registerModule(new JavaTimeModule());
-
-            return mapper;
+            // an exception is not thrown if the directory could not be created because it already exists
+            return Files.createDirectories(userHome.resolve(MOMO_FOLDER_NAME));
         }
-
-        @Provides
-        @MomoHome
-        public Path provideMomoHome()
+        catch (IOException e)
         {
-            Path userHome = SystemUtils.getUserHome().toPath();
-
-            try
-            {
-                // an exception is not thrown if the directory could not be created because it already exists
-                return Files.createDirectories(userHome.resolve(MOMO_FOLDER_NAME));
-            }
-            catch (IOException e)
-            {
-                throw new UncheckedIOException(e);
-            }
-        }
-
-        @Override
-        protected void configure()
-        {
-            bind(MonthlyHoursService.class).to(FileBasedMonthlyHoursService.class);
+            throw new UncheckedIOException(e);
         }
     }
+
+    @Override
+    protected void configure()
+    {
+        bind(MonthlyHoursService.class).to(FileBasedMonthlyHoursService.class);
+    }
+}
