@@ -22,49 +22,32 @@
  * SOFTWARE.
  */
 
-package momo.model;
+package momo.services;
 
-import java.time.YearMonth;
-import java.util.NavigableSet;
-import java.util.Objects;
-import java.util.TreeSet;
+import java.io.IOException;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.google.inject.Inject;
 
-/**
- * TODO
- */
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class MonthlyRecording
+import momo.GuiceExtension;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+
+@ExtendWith(GuiceExtension.class)
+@DisplayName("Configuration-Service")
+class ConfigurationServiceTest
 {
-    @JsonProperty("month")
-    private YearMonth month;
+    @Inject
+    ConfigurationService service;
 
-    @Builder.Default
-    @JsonDeserialize(as = TreeSet.class)
-    @JsonProperty("days")
-    private NavigableSet<DailyRecording> days = new TreeSet<>();
-
-    public void add(final DailyRecording dailyRecording)
+    @Test
+    void readConfiguration() throws IOException
     {
-        days.add(dailyRecording);
-    }
-
-    public static MonthlyRecording createFor(final YearMonth month)
-    {
-        Objects.requireNonNull(month, "month");
-
-        return MonthlyRecording.builder()
-                .month(month)
-                .build();
+        assertThat(service.readConfiguration(), is(notNullValue()));
     }
 }

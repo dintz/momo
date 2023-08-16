@@ -22,49 +22,33 @@
  * SOFTWARE.
  */
 
-package momo.model;
+package momo.util;
 
-import java.time.YearMonth;
-import java.util.NavigableSet;
-import java.util.Objects;
-import java.util.TreeSet;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-/**
- * TODO
- */
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class MonthlyRecording
+public class StreamUtil
 {
-    @JsonProperty("month")
-    private YearMonth month;
-
-    @Builder.Default
-    @JsonDeserialize(as = TreeSet.class)
-    @JsonProperty("days")
-    private NavigableSet<DailyRecording> days = new TreeSet<>();
-
-    public void add(final DailyRecording dailyRecording)
+    /**
+     * FIXME
+     *
+     * @param <T>
+     *
+     * @return
+     */
+    public static <T> Collector<T, ?, T> toSingleton()
     {
-        days.add(dailyRecording);
+        return Collectors.collectingAndThen(
+                Collectors.toList(),
+                list ->
+                {
+                    if (list.size() != 1)
+                    {
+                        throw new IllegalStateException();
+                    }
+                    return list.get(0);
+                }
+        );
     }
 
-    public static MonthlyRecording createFor(final YearMonth month)
-    {
-        Objects.requireNonNull(month, "month");
-
-        return MonthlyRecording.builder()
-                .month(month)
-                .build();
-    }
 }

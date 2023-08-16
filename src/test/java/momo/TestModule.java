@@ -33,6 +33,8 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 
 import momo.config.MomoHome;
+import momo.services.ConfigurationService;
+import momo.services.FileBasedConfigurationService;
 import momo.services.FileBasedMonthlyHoursService;
 import momo.services.MonthlyHoursService;
 
@@ -52,13 +54,13 @@ public class TestModule extends AbstractModule
     {
         final var mapper = new JsonMapper();
         mapper.registerModule(new JavaTimeModule());
-
         return mapper;
     }
 
     @Override
     protected void configure()
     {
+        bind(ConfigurationService.class).to(FileBasedConfigurationService.class);
         bind(MonthlyHoursService.class).to(FileBasedMonthlyHoursService.class);
     }
 }

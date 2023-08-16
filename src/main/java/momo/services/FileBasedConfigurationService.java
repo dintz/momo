@@ -22,49 +22,43 @@
  * SOFTWARE.
  */
 
-package momo.model;
+package momo.services;
 
-import java.time.YearMonth;
-import java.util.NavigableSet;
-import java.util.Objects;
-import java.util.TreeSet;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.google.inject.Inject;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import momo.config.MomoHome;
+import momo.model.MomoConfiguration;
 
-/**
- * TODO
- */
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class MonthlyRecording
+public class FileBasedConfigurationService implements ConfigurationService
 {
-    @JsonProperty("month")
-    private YearMonth month;
+    public static final String CONFIG_FILE_NAME = "momo.json";
 
-    @Builder.Default
-    @JsonDeserialize(as = TreeSet.class)
-    @JsonProperty("days")
-    private NavigableSet<DailyRecording> days = new TreeSet<>();
+    @Inject
+    @MomoHome
+    private Path home;
 
-    public void add(final DailyRecording dailyRecording)
+    @Inject
+    private JsonMapper mapper;
+
+    @Override
+    public MomoConfiguration readConfiguration() throws IOException
     {
-        days.add(dailyRecording);
-    }
+        final var filePath = home.resolve(CONFIG_FILE_NAME);
 
-    public static MonthlyRecording createFor(final YearMonth month)
-    {
-        Objects.requireNonNull(month, "month");
-
-        return MonthlyRecording.builder()
-                .month(month)
-                .build();
+        if (Files.exists(filePath))
+        {
+            return mapper.readValue(filePath.toFile(), MomoConfiguration.class);
+        }
+        else
+        {
+            final var defaultCfg = MomoConfiguration.builder().build();
+            mapper.writerWithDefaultPrettyPrinter().writeValue(filePath.toFile(), defaultCfg);
+            return defaultCfg;
+        }
     }
 }

@@ -26,10 +26,10 @@ package momo.model;
 
 import java.time.LocalTime;
 import java.time.MonthDay;
-import java.util.NavigableSet;
+import java.util.LinkedList;
 import java.util.Objects;
-import java.util.TreeSet;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
@@ -51,9 +51,9 @@ public class DailyRecording implements Comparable<DailyRecording>
     private MonthDay day;
 
     @Builder.Default
-    @JsonDeserialize(as = TreeSet.class)
+    @JsonDeserialize(as = LinkedList.class)
     @JsonProperty("records")
-    private NavigableSet<LocalTime> records = new TreeSet<>();
+    private LinkedList<TimeRecord> records = new LinkedList<>();
 
     @Override
     public int compareTo(final DailyRecording other)
@@ -63,7 +63,26 @@ public class DailyRecording implements Comparable<DailyRecording>
 
     public void add(final LocalTime timeRecord)
     {
-        records.add(timeRecord);
+        if (!records.isEmpty() && records.getLast().isOpen())
+        {
+            records.getLast().setStop(timeRecord);
+        }
+        else
+        {
+            records.add(TimeRecord.builder().start(timeRecord).build());
+        }
+    }
+
+    /**
+     * @return the total daily duration in minutes
+     */
+    @JsonIgnore
+    public int getDailyDuration()
+    {
+        return records.stream()
+                .map(TimeRecord::getDuration)
+                .reduce(Integer::sum)
+                .orElse(0);
     }
 
     public static DailyRecording createFor(final MonthDay day)
@@ -72,13 +91,6 @@ public class DailyRecording implements Comparable<DailyRecording>
 
         return DailyRecording.builder()
                 .day(day)
-                .build();
-    }
-
-    public static DailyRecording createForNow()
-    {
-        return DailyRecording.builder()
-                .day(MonthDay.now())
                 .build();
     }
 }

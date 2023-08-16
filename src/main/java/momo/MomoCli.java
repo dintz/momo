@@ -24,13 +24,20 @@
 
 package momo;
 
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.concurrent.Callable;
+
+import com.google.inject.Inject;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import momo.command.MomoTrack;
 import momo.config.GuiceFactory;
 import momo.config.LoggingMixin;
+import momo.config.MomoHome;
+import momo.services.ConfigurationService;
+import momo.services.MonthlyHoursService;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Mixin;
@@ -51,13 +58,32 @@ public class MomoCli implements Callable<Integer>
     @Getter
     private LoggingMixin loggingMixin;
 
+    @Inject
+    private ConfigurationService cfgService;
+
+    @Inject
+    private MonthlyHoursService monthlyService;
+
+    @Inject
+    @MomoHome
+    private Path home;
+
     @Override
-    public Integer call()
+    public Integer call() throws IOException
     {
-        log.trace("Starting... (trace) from app");
-        log.debug("Starting... (debug) from app");
-        log.info("Starting... (info)  from app");
-        log.warn("Starting... (warn)  from app");
+        final var config = cfgService.readConfiguration();
+        final var report = monthlyService.generateIntermediateReport(config);
+
+        log.info("--------------------------------");
+        log.info("today: {}", report.getDailyActualHours());
+        log.info("--------------------------------");
+        log.info("week actual: {}", report.getWeeklyActualHours());
+        log.info("weekly overtime: {}", report.getWeeklyOvertime());
+        log.info("--------------------------------");
+        log.info("month planned: {}", report.getMonthlyPlannedHours());
+        log.info("month actual: {}", report.getMonthlyActualHours());
+        log.info("month overtime: {}", report.getMonthlyOvertime());
+        log.info("--------------------------------");
 
         return 0;
     }

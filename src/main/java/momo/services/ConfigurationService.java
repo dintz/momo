@@ -22,49 +22,18 @@
  * SOFTWARE.
  */
 
-package momo.model;
+package momo.services;
 
-import java.time.YearMonth;
-import java.util.NavigableSet;
-import java.util.Objects;
-import java.util.TreeSet;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import momo.model.MomoConfiguration;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-/**
- * TODO
- */
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class MonthlyRecording
+public interface ConfigurationService
 {
-    @JsonProperty("month")
-    private YearMonth month;
-
-    @Builder.Default
-    @JsonDeserialize(as = TreeSet.class)
-    @JsonProperty("days")
-    private NavigableSet<DailyRecording> days = new TreeSet<>();
-
-    public void add(final DailyRecording dailyRecording)
-    {
-        days.add(dailyRecording);
-    }
-
-    public static MonthlyRecording createFor(final YearMonth month)
-    {
-        Objects.requireNonNull(month, "month");
-
-        return MonthlyRecording.builder()
-                .month(month)
-                .build();
-    }
+    /**
+     * @throws FileNotFoundException
+     *         if the monthly recording file for the given month doesn't exist
+     */
+    MomoConfiguration readConfiguration() throws IOException;
 }

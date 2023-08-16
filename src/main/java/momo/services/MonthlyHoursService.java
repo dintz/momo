@@ -26,8 +26,13 @@ package momo.services;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
+
+import momo.model.MomoConfiguration;
+import momo.model.IntermediateReport;
+import momo.model.MonthlyRecording;
 
 public interface MonthlyHoursService
 {
@@ -47,4 +52,29 @@ public interface MonthlyHoursService
      * @return <code>true</code> if new recording is created
      */
     boolean createMonthlyRecordingIfAbsent(final YearMonth month) throws IOException;
+
+    /**
+     * FIXME
+     *
+     * @param configuration
+     *
+     * @return
+     *
+     * @throws IOException
+     */
+    IntermediateReport generateIntermediateReport(final MomoConfiguration configuration) throws IOException;
+
+    /**
+     * TODO
+     *
+     * @param configuration
+     * @param monthlyRecording
+     *
+     * @return
+     *
+     * @throws IOException
+     */
+    IntermediateReport generateIntermediateReport(final MomoConfiguration configuration,
+                                                  final MonthlyRecording monthlyRecording,
+                                                  final LocalDate today) throws IOException;
 }

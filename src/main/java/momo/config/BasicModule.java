@@ -36,6 +36,8 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 
+import momo.services.ConfigurationService;
+import momo.services.FileBasedConfigurationService;
 import momo.services.FileBasedMonthlyHoursService;
 import momo.services.MonthlyHoursService;
 
@@ -72,6 +74,7 @@ public class BasicModule extends AbstractModule
     @Override
     protected void configure()
     {
+        bind(ConfigurationService.class).to(FileBasedConfigurationService.class);
         bind(MonthlyHoursService.class).to(FileBasedMonthlyHoursService.class);
     }
 }

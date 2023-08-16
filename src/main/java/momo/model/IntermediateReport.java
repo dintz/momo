@@ -24,47 +24,28 @@
 
 package momo.model;
 
-import java.time.YearMonth;
-import java.util.NavigableSet;
-import java.util.Objects;
-import java.util.TreeSet;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import java.math.BigDecimal;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * TODO
- */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class MonthlyRecording
+public class IntermediateReport
 {
-    @JsonProperty("month")
-    private YearMonth month;
+    private BigDecimal dailyActualHours;
 
-    @Builder.Default
-    @JsonDeserialize(as = TreeSet.class)
-    @JsonProperty("days")
-    private NavigableSet<DailyRecording> days = new TreeSet<>();
+    private BigDecimal weeklyActualHours;
 
-    public void add(final DailyRecording dailyRecording)
-    {
-        days.add(dailyRecording);
-    }
+    private BigDecimal weeklyOvertime;
 
-    public static MonthlyRecording createFor(final YearMonth month)
-    {
-        Objects.requireNonNull(month, "month");
+    private BigDecimal monthlyPlannedHours;
 
-        return MonthlyRecording.builder()
-                .month(month)
-                .build();
-    }
+    private BigDecimal monthlyActualHours;
+
+    private BigDecimal monthlyOvertime;
 }

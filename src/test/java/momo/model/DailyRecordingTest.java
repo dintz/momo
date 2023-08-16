@@ -24,47 +24,46 @@
 
 package momo.model;
 
-import java.time.YearMonth;
-import java.util.NavigableSet;
-import java.util.Objects;
-import java.util.TreeSet;
+import java.time.LocalTime;
+import java.time.MonthDay;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 
 /**
  * TODO
  */
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class MonthlyRecording
+@DisplayName("")
+class DailyRecordingTest
 {
-    @JsonProperty("month")
-    private YearMonth month;
-
-    @Builder.Default
-    @JsonDeserialize(as = TreeSet.class)
-    @JsonProperty("days")
-    private NavigableSet<DailyRecording> days = new TreeSet<>();
-
-    public void add(final DailyRecording dailyRecording)
+    @Test
+    @DisplayName("")
+    void compareTo()
     {
-        days.add(dailyRecording);
     }
 
-    public static MonthlyRecording createFor(final YearMonth month)
+    @Test
+    @DisplayName("")
+    void getDailyDuration()
     {
-        Objects.requireNonNull(month, "month");
+        var recording = DailyRecording.builder().day(MonthDay.now()).build();
+        recording.add(LocalTime.of(10, 30));
+        recording.add(LocalTime.of(11, 30));
+        recording.add(LocalTime.of(12, 30));
+        recording.add(LocalTime.of(13, 30));
+        recording.add(LocalTime.of(15, 0)); // should be ignored
 
-        return MonthlyRecording.builder()
-                .month(month)
-                .build();
+        assertThat(recording.getDailyDuration(), is(120));
+    }
+
+    @Test
+    void getEmptyDailyDuration()
+    {
+        var recording = DailyRecording.builder().day(MonthDay.now()).build();
+
+        assertThat(recording.getDailyDuration(), is(0));
     }
 }

@@ -26,8 +26,12 @@ package momo.services;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.nio.file.Files;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.MonthDay;
 import java.time.YearMonth;
 
 import org.junit.jupiter.api.DisplayName;
@@ -38,12 +42,16 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import com.google.inject.Inject;
 
 import momo.GuiceExtension;
+import momo.model.DailyRecording;
+import momo.model.MomoConfiguration;
+import momo.model.MonthlyRecording;
 
 import static java.time.temporal.ChronoUnit.MINUTES;
 import static momo.TestModule.FAKE_HOME;
 import static org.apache.commons.io.FileUtils.contentEquals;
 import static org.hamcrest.CoreMatchers.endsWith;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -74,7 +82,7 @@ class MonthlyHoursServiceTest
         @DisplayName("if absent with correct content")
         void createIfAbsent() throws IOException
         {
-            final var expectedPath = FAKE_HOME.resolve("2023-07.momo");
+            var expectedPath = FAKE_HOME.resolve("2023-07.momo");
 
             assertThat(service.createMonthlyRecordingIfAbsent(YearMonth.of(2023, 7)), is(true));
             assertTrue(contentEquals(expectedPath.toFile(), FAKE_HOME.resolve("2023-07.expected").toFile()));
@@ -115,15 +123,62 @@ class MonthlyHoursServiceTest
         @DisplayName("with correct content")
         void addThreeRecords() throws IOException
         {
-            final var expectedPath = FAKE_HOME.resolve("2023-01.momo");
+            var expectedPath = FAKE_HOME.resolve("2023-01.momo");
 
             assertThat(service.createMonthlyRecordingIfAbsent(YearMonth.of(2023, 1)), is(true));
             assertDoesNotThrow(() -> service.writeRecord(LocalDateTime.of(2023, 1, 15, 10, 30).truncatedTo(MINUTES)));
             assertDoesNotThrow(() -> service.writeRecord(LocalDateTime.of(2023, 1, 15, 11, 0).truncatedTo(MINUTES)));
             assertDoesNotThrow(() -> service.writeRecord(LocalDateTime.of(2023, 1, 15, 15, 59).truncatedTo(MINUTES)));
-            assertTrue(contentEquals(expectedPath.toFile(), FAKE_HOME.resolve("2023-01.expected").toFile()));
 
+            assertTrue(contentEquals(expectedPath.toFile(), FAKE_HOME.resolve("2023-01.expected").toFile()));
             assertDoesNotThrow(() -> Files.delete(expectedPath));
+
         }
+    }
+
+    @Test
+    @DisplayName("")
+    void generateIntermediateReport() throws IOException
+    {
+        var cfg = MomoConfiguration.builder()
+                .irwaz(32)
+                .build();
+
+        var monthly = MonthlyRecording.builder()
+                .month(YearMonth.of(2023, 8))
+                .build();
+
+        var daily8 = DailyRecording.builder() // 368 min
+                .day(MonthDay.of(8, 8))
+                .build();
+        daily8.add(LocalTime.of(8, 30));
+        daily8.add(LocalTime.of(14, 38));
+        var daily14 = DailyRecording.builder() // 180 min / TUESDAY
+                .day(MonthDay.of(8, 14))
+                .build();
+        daily14.add(LocalTime.of(9, 0));
+        daily14.add(LocalTime.of(12, 0));
+        var daily16 = DailyRecording.builder() // 207 min / WEDNESDAY
+                .day(MonthDay.of(8, 16))
+                .build();
+        daily16.add(LocalTime.of(8, 25));
+        daily16.add(LocalTime.of(9, 52));
+        daily16.add(LocalTime.of(12, 0));
+        daily16.add(LocalTime.of(14, 0));
+        daily16.add(LocalTime.of(16, 17));
+
+        monthly.add(daily8);
+        monthly.add(daily14);
+        monthly.add(daily16);
+
+        var report = service.generateIntermediateReport(cfg, monthly, LocalDate.of(2023, 8, 17));
+
+        assertThat(report, is(notNullValue()));
+        assertThat("dailyActualHours", report.getDailyActualHours(), is(new BigDecimal("3.45")));
+        assertThat("weeklyActualHours", report.getWeeklyActualHours(), is(new BigDecimal("6.45")));
+        assertThat("weeklyOvertime", report.getWeeklyOvertime(), is(new BigDecimal("-25.55")));
+        assertThat("monthlyPlannedHours", report.getMonthlyPlannedHours(), is(new BigDecimal("147.20")));
+        assertThat("monthlyActualHours", report.getMonthlyActualHours(), is(new BigDecimal("12.59")));
+        assertThat("monthlyOvertime", report.getMonthlyOvertime(), is(new BigDecimal("-134.61")));
     }
 }

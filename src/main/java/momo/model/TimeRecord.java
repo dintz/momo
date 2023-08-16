@@ -24,47 +24,47 @@
 
 package momo.model;
 
-import java.time.YearMonth;
-import java.util.NavigableSet;
-import java.util.Objects;
-import java.util.TreeSet;
+import java.time.Duration;
+import java.time.LocalTime;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * TODO
- */
+import static java.time.temporal.ChronoUnit.SECONDS;
+import static java.util.Objects.nonNull;
+
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class MonthlyRecording
+public class TimeRecord
 {
-    @JsonProperty("month")
-    private YearMonth month;
+    private LocalTime start;
+    private LocalTime stop;
 
-    @Builder.Default
-    @JsonDeserialize(as = TreeSet.class)
-    @JsonProperty("days")
-    private NavigableSet<DailyRecording> days = new TreeSet<>();
-
-    public void add(final DailyRecording dailyRecording)
+    @JsonIgnore
+    public boolean isOpen()
     {
-        days.add(dailyRecording);
+        return stop == null;
     }
 
-    public static MonthlyRecording createFor(final YearMonth month)
+    /**
+     * @return the duration of this record in minutes, if stop is not set always zero will be returned
+     */
+    @JsonIgnore
+    public int getDuration()
     {
-        Objects.requireNonNull(month, "month");
-
-        return MonthlyRecording.builder()
-                .month(month)
-                .build();
+        if (nonNull(start) && nonNull(stop))
+        {
+            return (int) (Duration.between(start, stop).get(SECONDS) / 60);
+        }
+        else
+        {
+            return 0;
+        }
     }
 }
