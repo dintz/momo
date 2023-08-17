@@ -32,9 +32,9 @@ import com.google.inject.Inject;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import momo.command.LoggingMixin;
 import momo.command.MomoTrack;
 import momo.config.GuiceFactory;
-import momo.config.LoggingMixin;
 import momo.config.MomoHome;
 import momo.services.ConfigurationService;
 import momo.services.MonthlyHoursService;
@@ -74,16 +74,24 @@ public class MomoCli implements Callable<Integer>
         final var config = cfgService.readConfiguration();
         final var report = monthlyService.generateIntermediateReport(config);
 
-        log.info("--------------------------------");
-        log.info("today: {}", report.getDailyActualHours());
-        log.info("--------------------------------");
-        log.info("week actual: {}", report.getWeeklyActualHours());
-        log.info("weekly overtime: {}", report.getWeeklyOvertime());
-        log.info("--------------------------------");
-        log.info("month planned: {}", report.getMonthlyPlannedHours());
-        log.info("month actual: {}", report.getMonthlyActualHours());
-        log.info("month overtime: {}", report.getMonthlyOvertime());
-        log.info("--------------------------------");
+        log.info("Time tracking is active and records your working time.");
+        log.info("  (use \"momo track\" to stop the tracking)");
+        log.info("");
+
+        log.info("Your current daily working time:");
+        log.info("");
+        log.info("\t{} hours",
+                report.getDailyActualHours());
+        log.info("");
+        log.info("Recorded working time for this week:");
+        log.info("");
+        log.info("\t{} hours ({} hours to planned)",
+                report.getWeeklyActualHours(), report.getWeeklyOvertime());
+        log.info("");
+        log.info("Overview of monthly working time:");
+        log.info("");
+        log.info("\t{} of {} hours ({} hours to planned)",
+                report.getMonthlyPlannedHours(), report.getMonthlyActualHours(), report.getMonthlyOvertime());
 
         return 0;
     }

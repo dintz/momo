@@ -76,5 +76,5 @@ public interface MonthlyHoursService
      */
     IntermediateReport generateIntermediateReport(final MomoConfiguration configuration,
                                                   final MonthlyRecording monthlyRecording,
-                                                  final LocalDate today) throws IOException;
+                                                  final LocalDateTime today) throws IOException;
 }

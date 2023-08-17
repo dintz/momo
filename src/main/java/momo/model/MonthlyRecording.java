@@ -41,7 +41,7 @@ import lombok.NoArgsConstructor;
  * TODO
  */
 @Data
-@Builder
+@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 public class MonthlyRecording

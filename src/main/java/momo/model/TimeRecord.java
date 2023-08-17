@@ -38,7 +38,7 @@ import static java.time.temporal.ChronoUnit.SECONDS;
 import static java.util.Objects.nonNull;
 
 @Data
-@Builder
+@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 public class TimeRecord
@@ -65,6 +65,26 @@ public class TimeRecord
         else
         {
             return 0;
+        }
+    }
+
+    /**
+     * TODO
+     *
+     * @param timeToClose
+     *
+     * @return
+     */
+    public boolean close(final LocalTime timeToClose)
+    {
+        if (isOpen())
+        {
+            stop = timeToClose;
+            return true;
+        }
+        else
+        {
+            return false;
         }
     }
 }

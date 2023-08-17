@@ -28,7 +28,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.file.Files;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.MonthDay;
@@ -137,7 +136,7 @@ class MonthlyHoursServiceTest
     }
 
     @Test
-    @DisplayName("")
+    @DisplayName("generate report")
     void generateIntermediateReport() throws IOException
     {
         var cfg = MomoConfiguration.builder()
@@ -158,27 +157,27 @@ class MonthlyHoursServiceTest
                 .build();
         daily14.add(LocalTime.of(9, 0));
         daily14.add(LocalTime.of(12, 0));
-        var daily16 = DailyRecording.builder() // 207 min / WEDNESDAY
+        var daily16 = DailyRecording.builder() // 207 + 15 min / WEDNESDAY
                 .day(MonthDay.of(8, 16))
                 .build();
         daily16.add(LocalTime.of(8, 25));
         daily16.add(LocalTime.of(9, 52));
         daily16.add(LocalTime.of(12, 0));
         daily16.add(LocalTime.of(14, 0));
-        daily16.add(LocalTime.of(16, 17));
+        daily16.add(LocalTime.of(16, 45));
 
         monthly.add(daily8);
         monthly.add(daily14);
         monthly.add(daily16);
 
-        var report = service.generateIntermediateReport(cfg, monthly, LocalDate.of(2023, 8, 17));
+        var report = service.generateIntermediateReport(cfg, monthly, LocalDateTime.of(2023, 8, 16, 17, 0));
 
         assertThat(report, is(notNullValue()));
-        assertThat("dailyActualHours", report.getDailyActualHours(), is(new BigDecimal("3.45")));
-        assertThat("weeklyActualHours", report.getWeeklyActualHours(), is(new BigDecimal("6.45")));
-        assertThat("weeklyOvertime", report.getWeeklyOvertime(), is(new BigDecimal("-25.55")));
+        assertThat("dailyActualHours", report.getDailyActualHours(), is(new BigDecimal("3.70")));
+        assertThat("weeklyActualHours", report.getWeeklyActualHours(), is(new BigDecimal("6.70")));
+        assertThat("weeklyOvertime", report.getWeeklyOvertime(), is(new BigDecimal("-25.30")));
         assertThat("monthlyPlannedHours", report.getMonthlyPlannedHours(), is(new BigDecimal("147.20")));
-        assertThat("monthlyActualHours", report.getMonthlyActualHours(), is(new BigDecimal("12.59")));
-        assertThat("monthlyOvertime", report.getMonthlyOvertime(), is(new BigDecimal("-134.61")));
+        assertThat("monthlyActualHours", report.getMonthlyActualHours(), is(new BigDecimal("12.84")));
+        assertThat("monthlyOvertime", report.getMonthlyOvertime(), is(new BigDecimal("-134.36")));
     }
 }

@@ -49,7 +49,7 @@ public class TimeUtil
     private static final DayOfWeek firstBusinessDay = MONDAY;
     private static final DayOfWeek lastBusinessDay = FRIDAY;
 
-    public static List<LocalDate> getWorkdays(final LocalDate startDate, final LocalDate endDate)
+    public static List<LocalDate> getWorkdays(final LocalDate startDateInclusive, final LocalDate endDateInclusive)
     {
         /*
         final Set<LocalDate> holidays = Set.of(
@@ -58,7 +58,7 @@ public class TimeUtil
         */
 
         // Note: End date itself is NOT included
-        return startDate.datesUntil(endDate.plusDays(1))
+        return startDateInclusive.datesUntil(endDateInclusive.plusDays(1))
 
                 // Retain all business days. Use static imports from
                 // java.time.DayOfWeek.*
@@ -72,10 +72,11 @@ public class TimeUtil
                 .toList();
     }
 
-    public static List<LocalDate> getWorkdaysInThisWeek(final LocalDate todayExclusive)
+    public static List<LocalDate> getWeekWorkdaysUntil(final LocalDate dateInclusive)
     {
-        return todayExclusive.with(previousOrSame(firstBusinessDay))
-                .datesUntil(todayExclusive)
+        // Note: End date itself is NOT included
+        return dateInclusive.with(previousOrSame(firstBusinessDay))
+                .datesUntil(dateInclusive.plusDays(1))
                 .toList();
     }
 }

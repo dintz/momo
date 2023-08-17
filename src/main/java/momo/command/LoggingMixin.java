@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package momo.config;
+package momo.command;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.Appender;
@@ -174,14 +174,13 @@ public class LoggingMixin
 
     private Level calcLogLevel()
     {
-        switch (getVerbosity().length)
+        if (getVerbosity().length == 2)
         {
-            case 0:
-                return Level.INFO;
-            case 1:
-                return Level.DEBUG;
-            default:
-                return Level.TRACE;
+            return Level.TRACE;
+        }
+        else
+        {
+            return Level.TRACE;
         }
     }
 }

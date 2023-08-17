@@ -42,7 +42,7 @@ import lombok.NoArgsConstructor;
  * TODO
  */
 @Data
-@Builder
+@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 public class DailyRecording implements Comparable<DailyRecording>
@@ -54,6 +54,35 @@ public class DailyRecording implements Comparable<DailyRecording>
     @JsonDeserialize(as = LinkedList.class)
     @JsonProperty("records")
     private LinkedList<TimeRecord> records = new LinkedList<>();
+
+    /**
+     * @return the total daily duration in minutes
+     */
+    @JsonIgnore
+    public int getDailyDuration()
+    {
+        return records.stream()
+                .map(TimeRecord::getDuration)
+                .reduce(Integer::sum)
+                .orElse(0);
+    }
+
+    /**
+     * TODO
+     *
+     * @param timeToClose
+     *
+     * @return
+     */
+    public boolean closeLatestRecordIfOpen(LocalTime timeToClose)
+    {
+        if (!records.isEmpty() && records.getLast().isOpen())
+        {
+            return records.getLast().close(timeToClose);
+        }
+
+        return false;
+    }
 
     @Override
     public int compareTo(final DailyRecording other)
@@ -71,18 +100,6 @@ public class DailyRecording implements Comparable<DailyRecording>
         {
             records.add(TimeRecord.builder().start(timeRecord).build());
         }
-    }
-
-    /**
-     * @return the total daily duration in minutes
-     */
-    @JsonIgnore
-    public int getDailyDuration()
-    {
-        return records.stream()
-                .map(TimeRecord::getDuration)
-                .reduce(Integer::sum)
-                .orElse(0);
     }
 
     public static DailyRecording createFor(final MonthDay day)
