@@ -15,7 +15,7 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     steps:
-      - name: Check out the code
+      - name: Checkout
         uses: actions/checkout@v3
 
       - name: Check Java Version
@@ -35,26 +35,6 @@ jobs:
         uses: janisz/action@v2
         with:
           paths: "target/surefire-reports/TEST-*.xml"
-
-      - name: Test Report
-        uses:  dorny/test-reporter@v1
-        with:
-          name: JUnit Tests
-          path: "target/surefire-reports/TEST-*.xml"
-          reporter: java-junit
-
-      - name: Coverage Report
-        id: jacoco_reporter
-        uses: PavanMudigonda/jacoco-reporter@v4.8
-        with:
-          coverage_results_path: target/site/jacoco/jacoco.xml
-          coverage_report_name: Coverage
-          coverage_report_title: JaCoCo
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          skip_check_run: false
-          minimum_coverage: 80
-          fail_below_threshold: false
-          publish_only_summary: false
 
       - name: Upload JAR Artifact
         uses: actions/upload-artifact@v3.1.2
