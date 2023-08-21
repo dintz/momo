@@ -28,6 +28,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.MonthDay;
@@ -66,6 +67,9 @@ class MonthlyHoursServiceTest
     @Inject
     MonthlyHoursService service;
 
+    @Inject
+    Path fakeHome;
+
     @Nested
     @DisplayName("create monthly recording file")
     class CreateMonthlyRecordingIfAbsent
@@ -74,7 +78,7 @@ class MonthlyHoursServiceTest
         @DisplayName("not if exists")
         void doNothingIfExist() throws IOException
         {
-            assertThat(service.createMonthlyRecordingIfAbsent(YearMonth.of(2023, 8)), is(false));
+            assertThat(service.createMonthlyRecordingIfAbsent(fakeHome, YearMonth.of(2023, 8)), is(false));
         }
 
         @Test
@@ -83,7 +87,7 @@ class MonthlyHoursServiceTest
         {
             var expectedPath = FAKE_HOME.resolve("2023-07.momo");
 
-            assertThat(service.createMonthlyRecordingIfAbsent(YearMonth.of(2023, 7)), is(true));
+            assertThat(service.createMonthlyRecordingIfAbsent(fakeHome, YearMonth.of(2023, 7)), is(true));
             assertTrue(contentEquals(expectedPath.toFile(), FAKE_HOME.resolve("2023-07.expected").toFile()));
 
             assertDoesNotThrow(() -> Files.delete(expectedPath));
@@ -93,7 +97,7 @@ class MonthlyHoursServiceTest
         @DisplayName("if no file with correct extension exists")
         void createIfWrongExtension() throws IOException
         {
-            assertThat(service.createMonthlyRecordingIfAbsent(YearMonth.of(2023, 5)), is(true));
+            assertThat(service.createMonthlyRecordingIfAbsent(fakeHome, YearMonth.of(2023, 5)), is(true));
 
             // TODO needs prepared folder that could be deleted
             assertDoesNotThrow(() -> Files.delete(FAKE_HOME.resolve("2023-05.momo")));
@@ -106,7 +110,7 @@ class MonthlyHoursServiceTest
             // is folder not file
             FileNotFoundException ex = assertThrows(
                     FileNotFoundException.class,
-                    () -> service.createMonthlyRecordingIfAbsent(YearMonth.of(2023, 6)),
+                    () -> service.createMonthlyRecordingIfAbsent(fakeHome, YearMonth.of(2023, 6)),
                     "Expected createMonthlyRecordingIfAbsent() to throw, but it didn't"
             );
 
@@ -124,10 +128,13 @@ class MonthlyHoursServiceTest
         {
             var expectedPath = FAKE_HOME.resolve("2023-01.momo");
 
-            assertThat(service.createMonthlyRecordingIfAbsent(YearMonth.of(2023, 1)), is(true));
-            assertDoesNotThrow(() -> service.writeRecord(LocalDateTime.of(2023, 1, 15, 10, 30).truncatedTo(MINUTES)));
-            assertDoesNotThrow(() -> service.writeRecord(LocalDateTime.of(2023, 1, 15, 11, 0).truncatedTo(MINUTES)));
-            assertDoesNotThrow(() -> service.writeRecord(LocalDateTime.of(2023, 1, 15, 15, 59).truncatedTo(MINUTES)));
+            assertThat(service.createMonthlyRecordingIfAbsent(fakeHome, YearMonth.of(2023, 1)), is(true));
+            assertDoesNotThrow(
+                    () -> service.writeRecord(fakeHome, LocalDateTime.of(2023, 1, 15, 10, 30).truncatedTo(MINUTES)));
+            assertDoesNotThrow(
+                    () -> service.writeRecord(fakeHome, LocalDateTime.of(2023, 1, 15, 11, 0).truncatedTo(MINUTES)));
+            assertDoesNotThrow(
+                    () -> service.writeRecord(fakeHome, LocalDateTime.of(2023, 1, 15, 15, 59).truncatedTo(MINUTES)));
 
             assertTrue(contentEquals(expectedPath.toFile(), FAKE_HOME.resolve("2023-01.expected").toFile()));
             assertDoesNotThrow(() -> Files.delete(expectedPath));
@@ -170,7 +177,7 @@ class MonthlyHoursServiceTest
         monthly.add(daily14);
         monthly.add(daily16);
 
-        var report = service.generateIntermediateReport(cfg, monthly, LocalDateTime.of(2023, 8, 16, 17, 0));
+        var report = service.generateIntermediateReport(fakeHome, cfg, monthly, LocalDateTime.of(2023, 8, 16, 17, 0));
 
         assertThat(report, is(notNullValue()));
         assertThat("dailyActualHours", report.getDailyActualHours(), is(new BigDecimal("3.70")));

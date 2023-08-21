@@ -1,0 +1,16 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Momo [main]" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="momo.MomoCli" />
+    <module name="app" />
+    <option name="PROGRAM_PARAMETERS" value="--alt-home=src/test/resources/sandbox" />
+    <extension name="coverage">
+      <pattern>
+        <option name="PATTERN" value="momo.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
+    </extension>
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

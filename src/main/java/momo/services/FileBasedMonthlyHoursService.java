@@ -44,7 +44,6 @@ import java.util.stream.Collectors;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.google.inject.Inject;
 
-import momo.config.MomoHome;
 import momo.model.DailyRecording;
 import momo.model.IntermediateReport;
 import momo.model.MomoConfiguration;
@@ -65,14 +64,10 @@ public class FileBasedMonthlyHoursService implements MonthlyHoursService
     public static final BigDecimal MINUTES = new BigDecimal(60);
 
     @Inject
-    @MomoHome
-    private Path home;
-
-    @Inject
     private JsonMapper mapper;
 
     @Override
-    public void writeRecord(final LocalDateTime timeRecord) throws IOException
+    public void writeRecord(final Path home, final LocalDateTime timeRecord) throws IOException
     {
         Objects.requireNonNull(timeRecord, "timeRecord");
 
@@ -99,7 +94,7 @@ public class FileBasedMonthlyHoursService implements MonthlyHoursService
     }
 
     @Override
-    public boolean createMonthlyRecordingIfAbsent(final YearMonth month) throws IOException
+    public boolean createMonthlyRecordingIfAbsent(final Path home, final YearMonth month) throws IOException
     {
         Objects.requireNonNull(month, "month");
 
@@ -126,18 +121,20 @@ public class FileBasedMonthlyHoursService implements MonthlyHoursService
     }
 
     @Override
-    public IntermediateReport generateIntermediateReport(final MomoConfiguration configuration) throws IOException
+    public IntermediateReport generateIntermediateReport(final Path home, final MomoConfiguration configuration)
+            throws IOException
     {
         Objects.requireNonNull(configuration, "configuration");
 
         final var filePath = home.resolve(YearMonth.now().format(FILE_NAME_FORMATTER).concat(MOMO_FILE_EXTENSION));
         final var monthlyRecording = mapper.readValue(filePath.toFile(), MonthlyRecording.class);
 
-        return generateIntermediateReport(configuration, monthlyRecording, LocalDateTime.now());
+        return generateIntermediateReport(home, configuration, monthlyRecording, LocalDateTime.now());
     }
 
     @Override
-    public IntermediateReport generateIntermediateReport(final MomoConfiguration configuration,
+    public IntermediateReport generateIntermediateReport(final Path home,
+                                                         final MomoConfiguration configuration,
                                                          final MonthlyRecording monthlyRecording,
                                                          final LocalDateTime today)
     {

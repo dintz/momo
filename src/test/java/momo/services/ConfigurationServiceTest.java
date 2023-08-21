@@ -25,6 +25,7 @@
 package momo.services;
 
 import java.io.IOException;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -33,6 +34,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import com.google.inject.Inject;
 
 import momo.GuiceExtension;
+import momo.config.MomoHome;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -45,9 +47,12 @@ class ConfigurationServiceTest
     @Inject
     ConfigurationService service;
 
+    @Inject
+    Path fakeHome;
+
     @Test
     void readConfiguration() throws IOException
     {
-        assertThat(service.readConfiguration(), is(notNullValue()));
+        assertThat(service.readConfiguration(fakeHome), is(notNullValue()));
     }
 }

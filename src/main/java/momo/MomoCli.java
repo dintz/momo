@@ -26,14 +26,13 @@ package momo;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Objects;
 import java.util.concurrent.Callable;
 
 import com.google.inject.Inject;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import momo.command.LoggingMixin;
-import momo.command.MomoTrack;
 import momo.config.GuiceFactory;
 import momo.config.MomoHome;
 import momo.services.ConfigurationService;
@@ -41,6 +40,9 @@ import momo.services.MonthlyHoursService;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Mixin;
+import picocli.CommandLine.Option;
+
+import static picocli.CommandLine.ScopeType.INHERIT;
 
 /**
  * FIXME
@@ -58,6 +60,10 @@ public class MomoCli implements Callable<Integer>
     @Getter
     private LoggingMixin loggingMixin;
 
+    @Option(names = { "-H", "--alt-home" }, scope = INHERIT, paramLabel = "ALT_HOME_DIR",
+            description = "the alternative home directory")
+    private Path altHome;
+
     @Inject
     private ConfigurationService cfgService;
 
@@ -71,8 +77,8 @@ public class MomoCli implements Callable<Integer>
     @Override
     public Integer call() throws IOException
     {
-        final var config = cfgService.readConfiguration();
-        final var report = monthlyService.generateIntermediateReport(config);
+        final var config = cfgService.readConfiguration(getHome());
+        final var report = monthlyService.generateIntermediateReport(getHome(), config);
 
         log.info("Time tracking is active and records your working time.");
         log.info("  (use \"momo track\" to stop the tracking)");
@@ -91,9 +97,23 @@ public class MomoCli implements Callable<Integer>
         log.info("Overview of monthly working time:");
         log.info("");
         log.info("    {} of {} hours ({} hours to planned)",
-                report.getMonthlyPlannedHours(), report.getMonthlyActualHours(), report.getMonthlyOvertime());
+                report.getMonthlyActualHours(), report.getMonthlyPlannedHours(), report.getMonthlyOvertime());
 
         return 0;
+    }
+
+    protected Path getHome()
+    {
+        Objects.requireNonNull(home, "home");
+
+        if (Objects.isNull(altHome))
+        {
+            return home;
+        }
+        else
+        {
+            return altHome;
+        }
     }
 
     /**

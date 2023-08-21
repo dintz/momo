@@ -26,14 +26,17 @@ package momo.services;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Path;
 
 import momo.model.MomoConfiguration;
 
 public interface ConfigurationService
 {
     /**
+     * @param home
+     *
      * @throws FileNotFoundException
      *         if the monthly recording file for the given month doesn't exist
      */
-    MomoConfiguration readConfiguration() throws IOException;
+    MomoConfiguration readConfiguration(final Path home) throws IOException;
 }

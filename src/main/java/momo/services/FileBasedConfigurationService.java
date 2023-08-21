@@ -31,7 +31,6 @@ import java.nio.file.Path;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.google.inject.Inject;
 
-import momo.config.MomoHome;
 import momo.model.MomoConfiguration;
 
 public class FileBasedConfigurationService implements ConfigurationService
@@ -39,14 +38,10 @@ public class FileBasedConfigurationService implements ConfigurationService
     public static final String CONFIG_FILE_NAME = "momo.json";
 
     @Inject
-    @MomoHome
-    private Path home;
-
-    @Inject
     private JsonMapper mapper;
 
     @Override
-    public MomoConfiguration readConfiguration() throws IOException
+    public MomoConfiguration readConfiguration(final Path home) throws IOException
     {
         final var filePath = home.resolve(CONFIG_FILE_NAME);
 

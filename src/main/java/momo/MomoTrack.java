@@ -22,10 +22,9 @@
  * SOFTWARE.
  */
 
-package momo.command;
+package momo;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.Objects;
@@ -34,9 +33,9 @@ import java.util.concurrent.Callable;
 import com.google.inject.Inject;
 
 import lombok.extern.slf4j.Slf4j;
-import momo.config.MomoHome;
 import momo.services.MonthlyHoursService;
 import picocli.CommandLine.Command;
+import picocli.CommandLine.ParentCommand;
 
 import static java.time.temporal.ChronoUnit.MINUTES;
 
@@ -47,22 +46,20 @@ import static java.time.temporal.ChronoUnit.MINUTES;
 @Slf4j
 public class MomoTrack implements Callable<Integer>
 {
-    @Inject
-    private MonthlyHoursService service;
+    @ParentCommand
+    private MomoCli parent; // picocli injects reference to parent command
 
     @Inject
-    @MomoHome
-    private Path home;
+    private MonthlyHoursService service;
 
     @Override
     public Integer call()
     {
         Objects.requireNonNull(service, "service");
-        Objects.requireNonNull(home, "home");
 
         try
         {
-            if (service.createMonthlyRecordingIfAbsent(YearMonth.now()))
+            if (service.createMonthlyRecordingIfAbsent(parent.getHome(), YearMonth.now()))
             {
                 log.debug("New monthly recording for {} created", YearMonth.now());
             }
@@ -76,7 +73,7 @@ public class MomoTrack implements Callable<Integer>
         try
         {
             var tRecord = LocalDateTime.now().truncatedTo(MINUTES);
-            service.writeRecord(tRecord);
+            service.writeRecord(parent.getHome(), tRecord);
 
             log.info("Record %02d:%02d was added to today".formatted(tRecord.getHour(), tRecord.getMinute()));
         }

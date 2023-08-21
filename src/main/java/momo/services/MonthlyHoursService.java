@@ -26,6 +26,7 @@ package momo.services;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
@@ -43,7 +44,7 @@ public interface MonthlyHoursService
      * @throws FileNotFoundException
      *         if the monthly recording file for the given month doesn't exist
      */
-    void writeRecord(final LocalDateTime timeRecord) throws IOException;
+    void writeRecord(final Path home, final LocalDateTime timeRecord) throws IOException;
 
     /**
      * @param month
@@ -51,7 +52,7 @@ public interface MonthlyHoursService
      *
      * @return <code>true</code> if new recording is created
      */
-    boolean createMonthlyRecordingIfAbsent(final YearMonth month) throws IOException;
+    boolean createMonthlyRecordingIfAbsent(final Path home, final YearMonth month) throws IOException;
 
     /**
      * FIXME
@@ -62,7 +63,8 @@ public interface MonthlyHoursService
      *
      * @throws IOException
      */
-    IntermediateReport generateIntermediateReport(final MomoConfiguration configuration) throws IOException;
+    IntermediateReport generateIntermediateReport(final Path home, final MomoConfiguration configuration)
+            throws IOException;
 
     /**
      * TODO
@@ -74,7 +76,8 @@ public interface MonthlyHoursService
      *
      * @throws IOException
      */
-    IntermediateReport generateIntermediateReport(final MomoConfiguration configuration,
+    IntermediateReport generateIntermediateReport(final Path home,
+                                                  final MomoConfiguration configuration,
                                                   final MonthlyRecording monthlyRecording,
                                                   final LocalDateTime today) throws IOException;
 }

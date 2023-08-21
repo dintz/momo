@@ -43,8 +43,7 @@ public class TestModule extends AbstractModule
     public static Path FAKE_HOME = Paths.get("src","test","resources", "fake-home");
 
     @Provides
-    @MomoHome
-    public Path provideMomoHome()
+    public Path provideFakeHome()
     {
        return FAKE_HOME;
     }
