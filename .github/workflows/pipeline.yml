@@ -7,7 +7,7 @@ on:
     branches: [ "main" ]
 
 env:
-  ARTIFACT_JAR_NAME: jar
+  ARTIFACT_JAR_NAME: app
   ARTIFACT_REPORT_NAME: report
 
 jobs:
