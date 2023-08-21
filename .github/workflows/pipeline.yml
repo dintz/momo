@@ -40,7 +40,7 @@ jobs:
         uses: actions/upload-artifact@v3.1.2
         with:
           name: ${{ env.ARTIFACT_JAR_NAME }}
-          path: ./target/*.jar
+          path: ./target/app-*.jar
 
       - name: Upload Report Artifact
         uses: actions/upload-artifact@v3.1.2
