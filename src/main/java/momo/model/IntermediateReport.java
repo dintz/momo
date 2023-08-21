@@ -38,14 +38,9 @@ import lombok.NoArgsConstructor;
 public class IntermediateReport
 {
     private BigDecimal dailyActualHours;
-
     private BigDecimal weeklyActualHours;
-
     private BigDecimal weeklyOvertime;
-
     private BigDecimal monthlyPlannedHours;
-
     private BigDecimal monthlyActualHours;
-
     private BigDecimal monthlyOvertime;
 }

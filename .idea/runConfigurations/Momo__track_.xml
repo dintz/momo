@@ -1,8 +1,8 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Momo [main]" type="Application" factoryName="Application">
+  <configuration default="false" name="Momo [track]" type="Application" factoryName="Application">
     <option name="MAIN_CLASS_NAME" value="momo.MomoCli" />
     <module name="app" />
-    <option name="PROGRAM_PARAMETERS" value="-v --alt-home=src/test/resources/sandbox" />
+    <option name="PROGRAM_PARAMETERS" value="-v --alt-home=src/test/resources/sandbox track" />
     <extension name="coverage">
       <pattern>
         <option name="PATTERN" value="momo.*" />

@@ -27,6 +27,7 @@ package momo;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.Callable;
 
 import com.google.inject.Inject;
@@ -78,26 +79,35 @@ public class MomoCli implements Callable<Integer>
     public Integer call() throws IOException
     {
         final var config = cfgService.readConfiguration(getHome());
-        final var report = monthlyService.generateIntermediateReport(getHome(), config);
+        final var optReport = Optional.ofNullable(monthlyService.generateIntermediateReport(getHome(), config));
 
-        log.info("Time tracking is active and records your working time.");
-        log.info("  (use \"momo track\" to stop the tracking)");
-        log.info("");
+        if (optReport.isPresent())
+        {
+            var report = optReport.get();
+            log.info("Time tracking is active and records your working time.");
+            log.info("  (use \"momo track\" to stop the tracking)");
+            log.info("");
 
-        log.info("Your current daily working time:");
-        log.info("");
-        log.info("    {} hours",
-                report.getDailyActualHours());
-        log.info("");
-        log.info("Recorded working time for this week:");
-        log.info("");
-        log.info("    {} hours ({} hours to planned)",
-                report.getWeeklyActualHours(), report.getWeeklyOvertime());
-        log.info("");
-        log.info("Overview of monthly working time:");
-        log.info("");
-        log.info("    {} of {} hours ({} hours to planned)",
-                report.getMonthlyActualHours(), report.getMonthlyPlannedHours(), report.getMonthlyOvertime());
+            log.info("Your current daily working time:");
+            log.info("");
+            log.info("    {} hours",
+                    report.getDailyActualHours());
+            log.info("");
+            log.info("Recorded working time for this week:");
+            log.info("");
+            log.info("    {} hours ({} hours to planned)",
+                    report.getWeeklyActualHours(), report.getWeeklyOvertime());
+            log.info("");
+            log.info("Overview of monthly working time:");
+            log.info("");
+            log.info("    {} of {} hours ({} hours to planned)",
+                    report.getMonthlyActualHours(), report.getMonthlyPlannedHours(), report.getMonthlyOvertime());
+        }
+        else
+        {
+            log.info("There is no recording for the current month.");
+            log.info("  (use \"momo track\" to start a new tracking)");
+        }
 
         return 0;
     }
@@ -112,6 +122,7 @@ public class MomoCli implements Callable<Integer>
         }
         else
         {
+            log.debug("Alternative home directory found: {}", altHome.toAbsolutePath());
             return altHome;
         }
     }

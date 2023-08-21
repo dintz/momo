@@ -57,9 +57,11 @@ public class MomoTrack implements Callable<Integer>
     {
         Objects.requireNonNull(service, "service");
 
+        final var home = parent.getHome();
+
         try
         {
-            if (service.createMonthlyRecordingIfAbsent(parent.getHome(), YearMonth.now()))
+            if (service.createMonthlyRecordingIfAbsent(home, YearMonth.now()))
             {
                 log.debug("New monthly recording for {} created", YearMonth.now());
             }
@@ -73,9 +75,12 @@ public class MomoTrack implements Callable<Integer>
         try
         {
             var tRecord = LocalDateTime.now().truncatedTo(MINUTES);
-            service.writeRecord(parent.getHome(), tRecord);
+            final var daily = service.writeRecord(home, tRecord);
 
-            log.info("Record %02d:%02d was added to today".formatted(tRecord.getHour(), tRecord.getMinute()));
+            var sActive = daily.isActive() ? "active" : "off";
+            log.info("Time %02d:%02d was recorded (time tracking is %s, %d daily periods recognized)".formatted(
+                    tRecord.getHour(), tRecord.getMinute(), sActive, daily.getRecords().size()));
+            log.info("The today's working time is {} hours.", daily.getDailyHours());
         }
         catch (IOException e)
         {

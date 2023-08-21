@@ -24,6 +24,7 @@
 
 package momo.model;
 
+import java.math.BigDecimal;
 import java.time.LocalTime;
 import java.time.MonthDay;
 import java.util.LinkedList;
@@ -37,6 +38,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import static java.math.RoundingMode.UP;
 
 /**
  * TODO
@@ -68,15 +71,34 @@ public class DailyRecording implements Comparable<DailyRecording>
     }
 
     /**
+     * @return the total daily duration in minutes
+     */
+    @JsonIgnore
+    public BigDecimal getDailyHours()
+    {
+        var duration = getDailyDuration();
+        return duration > 0 ? BigDecimal.valueOf(duration).divide(BigDecimal.valueOf(60), 2, UP) : BigDecimal.ZERO;
+    }
+
+    /**
+     * @return
+     */
+    @JsonIgnore
+    public boolean isActive()
+    {
+        return !records.isEmpty() && records.getLast().isOpen();
+    }
+
+    /**
      * TODO
      *
      * @param timeToClose
      *
      * @return
      */
-    public boolean closeLatestRecordIfOpen(LocalTime timeToClose)
+    public boolean closeLatestRecordIfOpen(final LocalTime timeToClose)
     {
-        if (!records.isEmpty() && records.getLast().isOpen())
+        if (isActive())
         {
             return records.getLast().close(timeToClose);
         }

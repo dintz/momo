@@ -31,6 +31,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 
+import momo.model.DailyRecording;
 import momo.model.MomoConfiguration;
 import momo.model.IntermediateReport;
 import momo.model.MonthlyRecording;
@@ -44,7 +45,7 @@ public interface MonthlyHoursService
      * @throws FileNotFoundException
      *         if the monthly recording file for the given month doesn't exist
      */
-    void writeRecord(final Path home, final LocalDateTime timeRecord) throws IOException;
+    DailyRecording writeRecord(final Path home, final LocalDateTime timeRecord) throws IOException;
 
     /**
      * @param month
@@ -59,7 +60,7 @@ public interface MonthlyHoursService
      *
      * @param configuration
      *
-     * @return
+     * @return report or <code>null</code> if no report for the current month found
      *
      * @throws IOException
      */

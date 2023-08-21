@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.MonthDay;
 import java.time.YearMonth;
@@ -67,7 +68,7 @@ public class FileBasedMonthlyHoursService implements MonthlyHoursService
     private JsonMapper mapper;
 
     @Override
-    public void writeRecord(final Path home, final LocalDateTime timeRecord) throws IOException
+    public DailyRecording writeRecord(final Path home, final LocalDateTime timeRecord) throws IOException
     {
         Objects.requireNonNull(timeRecord, "timeRecord");
 
@@ -91,6 +92,8 @@ public class FileBasedMonthlyHoursService implements MonthlyHoursService
         daily.add(timeRecord.toLocalTime());
 
         mapper.writerWithDefaultPrettyPrinter().writeValue(filePath.toFile(), monthly);
+
+        return daily;
     }
 
     @Override
@@ -127,9 +130,16 @@ public class FileBasedMonthlyHoursService implements MonthlyHoursService
         Objects.requireNonNull(configuration, "configuration");
 
         final var filePath = home.resolve(YearMonth.now().format(FILE_NAME_FORMATTER).concat(MOMO_FILE_EXTENSION));
-        final var monthlyRecording = mapper.readValue(filePath.toFile(), MonthlyRecording.class);
 
-        return generateIntermediateReport(home, configuration, monthlyRecording, LocalDateTime.now());
+        if (Files.isRegularFile(filePath) && Files.isReadable(filePath))
+        {
+            final var monthlyRecording = mapper.readValue(filePath.toFile(), MonthlyRecording.class);
+            return generateIntermediateReport(home, configuration, monthlyRecording, LocalDateTime.now());
+        }
+        else
+        {
+            return null;
+        }
     }
 
     @Override
