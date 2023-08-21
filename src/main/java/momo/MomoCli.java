@@ -80,17 +80,17 @@ public class MomoCli implements Callable<Integer>
 
         log.info("Your current daily working time:");
         log.info("");
-        log.info("\t{} hours",
+        log.info("    {} hours",
                 report.getDailyActualHours());
         log.info("");
         log.info("Recorded working time for this week:");
         log.info("");
-        log.info("\t{} hours ({} hours to planned)",
+        log.info("    {} hours ({} hours to planned)",
                 report.getWeeklyActualHours(), report.getWeeklyOvertime());
         log.info("");
         log.info("Overview of monthly working time:");
         log.info("");
-        log.info("\t{} of {} hours ({} hours to planned)",
+        log.info("    {} of {} hours ({} hours to planned)",
                 report.getMonthlyPlannedHours(), report.getMonthlyActualHours(), report.getMonthlyOvertime());
 
         return 0;
